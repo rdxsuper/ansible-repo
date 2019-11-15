@@ -1,0 +1,9 @@
+---
+- name: Install Packages
+  import_role: 
+    name: package-manage
+    tasks_from: apt-install-packages
+    
+- name: update output
+  debug:
+    var: apt_out

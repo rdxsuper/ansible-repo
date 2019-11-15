@@ -1,0 +1,13 @@
+---
+
+- name: Uninstall packages
+  apt: 
+    name: "{{ package }}"
+    state: absent
+    autoclean: yes
+    autoremove: yes    
+  register: apt_out
+  ignore_errors: yes
+  loop: "{{ uninstall_packages }}"
+  loop_control: 
+    loop_var: package

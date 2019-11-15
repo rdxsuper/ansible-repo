@@ -1,0 +1,50 @@
+---
+
+- name: master playbook
+  hosts: all
+
+  tasks:
+    - name: package-manage
+      import_role: 
+        name: package-manage
+
+    - name: system-config
+      import_role: 
+        name: system-config
+
+    - name: pi-hole-deploy
+      import_role: 
+        name: pi-hole-deploy
+
+    - name: monitoring-setup
+      import_role: 
+        name: monitoring-setup
+
+    - name: squid-deploy
+      import_role: 
+        name: squid-deploy
+
+    - name: vault-deploy
+      import_role: 
+        name: vault-deploy
+
+    - name: jenkins-setup
+      import_role: 
+        name: jenkins-setup
+
+    - name: docker-maintenance
+      import_role: 
+        name: docker-maintenance
+
+    - name: nextcloud-deploy
+      import_role: 
+        name: nextcloud-deploy
+
+    - name: kubernetes-setup
+      import_role: 
+        name: kubernetes-setup
+
+    - name: network-config
+      import_role: 
+        name: network-config
+        

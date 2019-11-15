@@ -1,0 +1,17 @@
+---
+# vars file for squid-deploy
+
+
+template_files:
+  - src: 'Dockerfile.j2'
+    dest_dir: 'squid'
+    dest_file: 'Dockerfile'
+  - src: 'docker-compose.yml.j2'
+    dest_dir: 'squid'
+    dest_file: 'docker-compose.yml'
+  - src: 'entrypoint.sh.j2'
+    dest_dir: 'squid'
+    dest_file: 'entrypoint.sh'
+  - src: 'squid.conf.j2'
+    dest_dir: 'squid'
+    dest_file: 'squid.conf'

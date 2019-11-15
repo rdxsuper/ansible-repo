@@ -1,0 +1,47 @@
+---
+
+- name: copy no-dns.conf
+  copy:
+    src: ../files/no-dns.conf
+    dest: /etc/NetworkManager/conf.d/
+    owner: root
+    group: root
+    mode: 0644
+
+- name: copy no wifi powersave
+  copy:
+    src: ../files/default-wifi-powersave-on.conf
+    dest: /etc/NetworkManager/conf.d/
+    owner: root
+    group: root
+    mode: 0644
+
+- name: disable resolvconf.service, rdnssd.service, systemd-resolved.service, 
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+  with_items:
+    - resolvconf.service
+    - rdnssd.service
+    - systemd-resolved.service
+
+- name: remove resolv.conf
+  file:
+    path: /etc/resolv.conf
+    state: absent
+
+- name: copy resolv.conf
+  copy:
+    src: ../files/resolv.conf
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: network manager service restart
+  systemd:
+    name: NetworkManager
+    state: restarted
+    daemon_reload: yes

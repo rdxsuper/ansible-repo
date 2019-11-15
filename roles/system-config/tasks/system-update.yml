@@ -1,0 +1,12 @@
+---
+
+- name: Install System Update
+  import_role: 
+    name: package-manage
+    tasks_from: apt-system-update
+  vars:
+    upgrade: yes
+
+- name: update output
+  debug:
+    var: apt_out

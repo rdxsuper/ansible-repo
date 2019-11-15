@@ -1,0 +1,35 @@
+---
+# tasks file for package-install
+- import_tasks: apt-install-packages.yml
+  tags: apt_install_packages
+
+- import_tasks: apt-uninstall-packages.yml
+  tags: apt_uninstall_packages
+
+- import_tasks: apt-system-update.yml
+  tags: apt_system_update
+  
+- import_tasks: apt-update-cache.yml
+  tags: apt_update_cache
+
+- import_tasks: apt-setup-repos-with-keys.yml
+  tags: apt-setup-repos-with-keys
+
+- import_tasks: apt-setup-mirror-repo.yml
+  tags: apt-setup-mirror-repo
+
+- import_tasks: apt-setup-default-sources.yml
+  tags: apt-setup-default-sources
+
+
+- name: update output
+  debug:
+    var: apt_out
+  tags:
+    - apt_install_packages
+    - apt_uninstall_packages
+    - apt_system_update
+    - apt_update_cache
+    - apt-setup-repos-with-keys
+    - apt-setup-mirror-repo
+    - apt-setup-default-sources

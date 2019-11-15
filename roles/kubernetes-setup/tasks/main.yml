@@ -1,0 +1,49 @@
+---
+# tasks file for kubernets-setup
+#
+
+
+- name: Install Docker
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - docker
+    - curl
+
+- name: Enable and start Docker
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Download Kubernetes apt-key 
+  shell: 'curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add'
+
+- name: Add Xenial Kubernetes Repo
+  command: apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+
+- name: Install Kubeadm
+  apt:
+    name: kubeadm
+    state: latest
+
+- name: Swap off
+  command: "swapoff -a"
+
+- name: kubadm init
+  command: "kubeadm init --pod-network-cidr=10.244.0.0/16"
+
+- name: Create .kube dir
+  shell: "mkdir -p $HOME/.kube"
+  become: yes
+  become_user: 
+
+- name: Copy admin.conf 
+  shell: "cp /etc/kubernetes/admin.conf $HOME/.kube/config"
+  become: yes
+  become_user: 
+
+  
+
+

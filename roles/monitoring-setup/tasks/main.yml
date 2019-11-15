@@ -1,0 +1,26 @@
+---
+# tasks file for pi-hole-deploy
+# How to run
+# sudo ansible-playbook -i ../hosts -l rdxhome main.yml
+
+
+### Telegraf Deploy
+
+- name: Telegraf Setup
+  import_tasks: telegraf-setup.yml
+  when: app == "telegraf" or app == "both"
+
+
+### Prometheus Deploy    
+
+- name: Prometheus Setup
+  import_tasks: prometheus-setup.yml
+  when: app == "prometheus" or app == "both" 
+
+### Fluentbit Deploy
+
+- name: Fluentbit Setup
+  import_tasks: fluentbit-setup.yml
+  tags: fluentbit
+
+  

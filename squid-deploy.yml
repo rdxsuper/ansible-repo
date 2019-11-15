@@ -1,0 +1,5 @@
+---
+- hosts: squid
+  roles:
+    - squid-deploy
+  

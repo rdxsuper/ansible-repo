@@ -1,0 +1,17 @@
+FROM debian:stretch
+
+ENV DNS1 1.1.1.1
+ENV DNS2 1.0.0.1
+
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install wget -y && \
+    wget https://bin.equinox.io/c/VdrWdbjqyF/cloudflared-stable-linux-amd64.deb && \
+    apt-get install ./cloudflared-stable-linux-amd64.deb && \
+    useradd -s /usr/sbin/nologin -r -M cloudflared && \
+    chown cloudflared:cloudflared /usr/local/bin/cloudflared
+
+USER cloudflared
+
+CMD ["/bin/bash", "-c", "/usr/local/bin/cloudflared proxy-dns --address 0.0.0.0 --port 5054 --upstream https://${DNS1}/.well-known/dns-query --upstream https://${DNS2}/.well-known/dns-query"]
+

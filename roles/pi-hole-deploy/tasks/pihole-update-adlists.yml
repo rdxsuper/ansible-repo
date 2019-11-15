@@ -1,0 +1,14 @@
+---
+
+
+- name: Copy ad lists to pihole
+  copy:
+    src: pihole-block-lists
+    dest: "{{ path }}/{{ file.dest_dir }}/etc-pihole/adlists.list"
+    owner: root
+    group: root
+  loop: "{{ files }}"
+  loop_control:
+    loop_var: file
+    label: "{{ file.dest_dir }}"
+  when: file.name == "pihole"

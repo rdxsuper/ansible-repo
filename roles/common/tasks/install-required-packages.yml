@@ -1,0 +1,15 @@
+---
+
+- name: Install packages
+  apt: 
+    name: "{{ package }}"
+    state: present
+    autoclean: yes
+    autoremove: yes
+    update_cache: yes
+  register: apt_out
+  ignore_errors: yes
+  loop: "{{ packages }}"
+  loop_control: 
+    loop_var: package
+ 

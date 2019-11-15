@@ -1,0 +1,65 @@
+---
+#
+
+- name: set variable to empty the sources.list.d dir
+  set_fact:
+    list: 
+      - '/etc/apt/sources.list.d'
+      - '/etc/apt/sources.list'
+    
+- name: remove files in /etc/apt/sources.list.d
+  import_role: 
+    name: common 
+    tasks_from: remove-files.yml
+
+- name: Install 3rd party apt keys
+  apt_key:
+    url: "{{ item.key }}"
+    state: "{{ item.state }}"
+  loop:
+    - { key: 'https://www.virtualbox.org/download/oracle_vbox_2016.asc', state: present }
+    - { key: 'https://download.docker.com/linux/ubuntu/gpg', state: present }
+    - { key: 'https://packages.microsoft.com/keys/microsoft.asc', state: present }
+    - { key: 'https://packages.cloud.google.com/apt/doc/apt-key.gpg', state: present }
+    - { key: 'https://repos.influxdata.com/influxdb.key', state: present }
+    - { key: 'https://packages.fluentbit.io/fluentbit.key', state: present }
+       
+
+- name: adding system repos to sources lists
+  apt_repository:
+    repo: "{{ item.repo }}"
+    state: "{{ item.state }}"
+    update_cache: yes
+    filename: "{{ item.name }}"
+  loop:
+    ### Ubuntu System Repos
+    - { repo: 'deb [arch=amd64] file:/repo/mirror/us.archive.ubuntu.com/ubuntu bionic main restricted universe multiverse', state: present, name: ubuntu }
+    - { repo: 'deb [arch=amd64] file:/repo/mirror/us.archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse', state: present, name: ubuntu }
+    - { repo: 'deb [arch=amd64] file:/repo/mirror/us.archive.ubuntu.com/ubuntu bionic-backports main restricted universe multiverse', state: present, name: ubuntu }
+    - { repo: 'deb [arch=amd64] file:/repo/mirror/security.ubuntu.com/ubuntu bionic-security main restricted universe multiverse', state: present, name: ubuntu }
+
+- name: adding 3rd party repos to sources lists
+  apt_repository:
+    repo: "{{ item.repo }}"
+    state: "{{ item.state }}"
+    update_cache: yes
+    filename: "{{ item.name }}"
+  loop:    
+    ### Third Party Repos
+    - { repo: 'deb [arch=amd64] file:/repo/mirror/download.virtualbox.org/virtualbox/debian/ bionic contrib', state: present, name: virtualbox }
+    - { repo: 'deb [arch=amd64] file:/repo/mirror/download.docker.com/linux/ubuntu bionic stable', state: present, name: docker }
+    - { repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main', state: present, name: vscode }
+    - { repo: 'deb http://apt.kubernetes.io/ kubernetes-xenial main', state: present, name: kubernetes }
+    - { repo: 'deb https://repos.influxdata.com/ubuntu bionic stable', state: present, name: telegraf }
+    - { repo: 'deb https://packages.fluentbit.io/ubuntu/bionic bionic main', state: present, name: fluentbit }
+
+- name: Repo cache update
+  shell: ls /etc/apt/sources.list.d
+  register: apt_out
+  ignore_errors: yes
+
+- name: Repo cache update
+  apt: 
+    update_cache: yes
+  register: apt_out
+  ignore_errors: yes

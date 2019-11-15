@@ -1,0 +1,16 @@
+--- 
+
+- name: Un-install packages
+  apt: 
+    name: "{{ package }}"
+    state: "{{ state | default('absent') }}"
+    autoclean: yes
+    autoremove: yes
+    update_cache: yes
+    upgrade: "{{ upgrade | default('no') }}"
+    purge: "{{ purge | default('no') }}"
+  register: apt_out
+  ignore_errors: yes
+  loop: "{{ packages }}"
+  loop_control: 
+    loop_var: package

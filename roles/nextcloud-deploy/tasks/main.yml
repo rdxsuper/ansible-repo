@@ -1,0 +1,10 @@
+---
+
+- name: Copy config files
+  import_tasks: nextcloud-app-copy-files.yml
+  tags: nextcloud_app_copy_files
+
+- name: rdxcloud stack deploy
+  import_tasks: nextcloud-app-stack-deploy.yml
+  tags: nextcloud_app_stack_deploy
+

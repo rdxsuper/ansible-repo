@@ -1,0 +1,25 @@
+---
+# vars file for pi-hole-deploy
+
+
+# path: '/cloud/rdxcloud_docker/dns-over-tls'
+  # - /cloud/rdxcloud_docker/dns-over-tls/cloudflared
+  # - /cloud/rdxcloud_docker/dns-over-tls/pihole
+
+path: '/cloud/rdxcloud_docker/monitoring'
+
+#path: '/tmp/dns-over-tls'
+
+# Nextcloud ip and url are added to hosts file in pihole so that it doesnt block it 
+monitoring_ip: '192.168.1.213'
+monitoring_url: 'rdxcloud.ddns.net'
+
+files:
+  prometheus:
+    src_template: 'prometheus.yml.j2'
+    dest_dir: 'prometheus'
+    dest_file: 'prometheus.yml'
+  docker-compose:
+    src_template: 'monitoring-compose.yml.j2'
+    dest_dir: ''
+    dest_file: 'docker-compose.yml'

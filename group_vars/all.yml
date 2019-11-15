@@ -1,0 +1,91 @@
+---
+
+docker_path: ''
+
+# Telegraf and Prometheus Setup
+app: 'both'
+
+# # Proxy Variable
+# proxy_env:
+#   http_proxy: 
+#   https_proxy: 
+
+# vars file for system-config
+packages:
+  - 'bind9'
+  - 'docker'
+  - 'ansible'
+  - 'docker-compose'
+  - 'vim'
+  - 'virtualbox'
+  - 'vagrant'
+  - 'code'
+  - 'docker-ce'
+  - 'apt'
+  - 'network-manager'
+  - 'python3-dbus'
+  - 'libnm-glib-dev'
+  - 'aptitude'
+  - 'telegraf'
+
+# uninstall_packages:
+#   - network-manager
+#   - python3-dbus
+#   - libnm-glib-dev
+
+### Disk Variables
+disks:
+  - UUID: ""
+    dev: ""
+    mount_path: ""
+    fstype: ""
+    opts: ""
+    state: ""
+    name: ""
+
+
+### Python3 Variables
+python_packages:
+  - 'python3'
+  - 'python3-pip'
+
+pip3_modules:
+  - 'docker'
+  - 'docker-compose'
+
+### DNS Variables
+trusted_networks_ips:
+  - '192.168.1.0/24'
+  - '192.168.2.0/24'
+  - '127.0.0.1'
+
+listen_on_ips:
+  - ''
+  - ''
+
+forwarder_ips:
+  - 9.9.9.9
+  - 149.112.112.112
+
+dns_host: rdxhome
+
+### NFS Variables
+nfs: 
+  - UUID: ''
+    dev: ""
+    mount_path: ""
+    fstype: ""
+    opts: ""
+    state: ""
+    name: ""
+
+  - UUID: ''
+    dev: ""
+    mount_path: ""
+    fstype: ""
+    opts: ""
+    state: ""
+    name: ""
+
+nfs_server: ""
+nfs_client: ""

@@ -1,0 +1,19 @@
+---
+
+- name: Set packages variable
+  set_fact:
+    packages: 
+      - "{{ python_packages }}" 
+
+- name: Install python3 package
+  import_role: 
+    name: package-manage
+    tasks_from: apt-install-packages
+
+
+- name: pip install required modules
+  pip:
+    name: "{{ module }}"
+  loop: "{{ pip3_modules }}"
+  loop_control: 
+    loop_var: module

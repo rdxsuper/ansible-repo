@@ -1,0 +1,6 @@
+---
+# tasks file for docker-maintenance
+
+- name: include docker prune
+  import_tasks: docker-prune.yml
+  # when: docker_prune == "yes"

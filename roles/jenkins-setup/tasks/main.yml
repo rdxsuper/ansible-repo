@@ -1,0 +1,32 @@
+---
+# tasks file for jenkins-setup
+
+- name: Create required directories
+  file:
+    path: "{{ docker_path }}/{{ templates.dest_dir }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ template_files }}"
+  loop_control:
+    loop_var: templates
+      
+- name: Copy templates
+  template:
+    src: "{{ templates.src }}"
+    dest: "{{ docker_path }}/{{ templates.dest_dir }}/{{ templates.dest_file }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ template_files }}"
+  loop_control:
+    loop_var: templates
+
+- name: Jenkins docker setup
+  docker_compose:
+    project_src: "{{ docker_path }}/jenkins"
+    pull: yes
+    state: "{{ jenkins_state | default('present') }}"
+    build: yes
+    stopped: "{{ stopped | default('false') }}"
+  register: output
+  ignore_errors: yes 

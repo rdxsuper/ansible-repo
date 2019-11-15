@@ -1,0 +1,31 @@
+---
+
+- name: nfs client setup
+  copy:
+    src: ../files/lists/default.source.list
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install nfs packages on client
+  apt:
+    name: "{{ nfs_package }}"
+    state: present
+  loop:
+    - nfs-common
+  loop_control: 
+    loop_var: nfs_package
+
+- name: mount nfs shares on nfs client 
+  mount:
+    path: "{{ disk.mount_path }}"
+    src: "{{ disk.dev }}"
+    fstype: "{{ disk.fstype }}"
+    opts: "{{ disk.opts }}"
+    backup: yes
+    state: "{{ disk.state }}"
+  loop: "{{ nfs }}"
+  loop_control: 
+    loop_var: disk
+  tags: mountNfs

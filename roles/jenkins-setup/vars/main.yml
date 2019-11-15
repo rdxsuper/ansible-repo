@@ -1,0 +1,7 @@
+---
+# vars file for jenkins-setup
+
+template_files:
+  - src: 'docker-compose.yml.j2'
+    dest_dir: 'jenkins'
+    dest_file: 'docker-compose.yml'

@@ -1,0 +1,48 @@
+---
+
+
+- name: create directories
+  file:
+    path: "{{ path }}/{{ dir }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - cloudflared
+    - pihole
+  loop_control:
+    loop_var: dir
+
+- name: installing pip3
+  apt:
+    name: python3-pip
+    state: present
+    autoclean: yes
+    autoremove: yes  
+
+- name: pip install docker-compose
+  pip:
+    name: docker-compose
+   
+- name: git download latest pihole release
+  git:
+    repo: 'https://github.com/pi-hole/docker-pi-hole.git'
+    dest: "{{ path }}/pihole/"
+
+- name: copy overwrite_resolv.conf to cloudflare directory
+  copy:
+    src: overwrite_resolv.conf
+    dest: "{{ path }}/pihole/overwrite_resolv.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: copy templates
+  template:
+    src: "{{ file.src }}"
+    dest: "{{ path }}/{{ file.dest_dir }}/{{ file.dest_file }}"
+    owner: root
+    group: root
+    mode: 0755
+  loop: "{{ files }}"
+  loop_control:
+    loop_var: file

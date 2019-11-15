@@ -1,0 +1,11 @@
+---
+
+- name: System upgrade
+  apt: 
+    autoclean: yes
+    autoremove: yes
+    update_cache: yes
+    upgrade: "{{ upgrade | default('dist') }}"
+  register: apt_out
+  ignore_errors: yes
+

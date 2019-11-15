@@ -1,0 +1,61 @@
+---
+# tasks file for common...
+
+
+- name: setting nfs server info
+  set_fact: 
+    mirror_server: "nfs_server"
+
+- name: install apt-mirror
+  block:
+    - name: Install apt-mirror package
+      apt:
+        name: "{{ install_packages }}"
+        state: present
+      vars:
+        install_packages:
+          - apt-mirror
+
+    - name: setup apt mirror list
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { src: ../files/lists/mirror.list, dest: /etc/apt/mirror.list, owner: root, group: root, mode: '0644' }
+
+    - name: configure hourly cron for apt mirror 
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { src: ../files/repo-mirror-sync, dest: /etc/cron.hourly/, owner: root, group: root, mode: '0655' }
+
+  when: "inventory_hostname == nfs_server"
+
+- name: remove apt-mirror
+  block:
+    - name: Removing apt-mirror package
+      apt:
+        name: "{{ remove_packages }}"
+        state: absent
+      vars:
+        remove_packages:
+          - apt-mirror
+
+    - name: remove apt mirror list
+      file:
+        path: /etc/apt/mirror.list
+        state: absent
+
+    - name: remove hourly cron for apt mirror 
+      file:
+        path: /etc/cron.hourly/repo-mirror-sync
+        state: absent
+        
+  when: "inventory_hostname != nfs_server"

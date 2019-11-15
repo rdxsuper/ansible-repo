@@ -1,0 +1,77 @@
+---
+
+# - name: Set Proxy Env Variables
+#   proxy_env:
+#     http_proxy: http://192.168.2.240:3128
+#     https_proxy: http://192.168.2.240:3128
+#   when: proxy == "yes"
+
+
+- include_vars: main.yml
+
+- name: user env setup
+  import_tasks: user-account-setup.yml
+  tags: user_setup
+
+### Install Requisite Packages
+- name: Install Packages
+  import_role: 
+    name: package-manage
+    tasks_from: apt-install-packages
+    
+- name: update output
+  debug:
+    var: apt_out
+
+### Setup Wifi and DNS config
+- name: wifi and dns configuration
+  include_tasks: wifi-dns-configuration.yml
+
+### Setup Bind
+- name: setup bind9
+  import_tasks: bind-setup.yml
+  when: "dns_host in inventory_hostname"
+
+### Setup Apt Repos
+- name: apt sources setup
+  import_role: 
+    name: package-manage
+    tasks_from: apt-setup-repos-with-keys
+  tags: setup_sourcelist
+
+
+# - name: Uninstall packages
+#   include_tasks: uninstall-packages.yml
+#   tags: uninstall_packages
+
+- name: python3 setup
+  import_tasks: python3-setup.yml
+  tags: python3_setup
+
+- name: system apt update and upgrade
+  import_tasks: system-update.yml 
+  tags: 
+    - apt_system_update
+  
+    
+- name: mount disks or disk
+  include_tasks: filesystem.yml
+  loop: "{{ disks }}"
+  loop_control: 
+    loop_var: disk  
+  tags: mountDisk
+
+- name: nfs server/client setup
+  block:
+
+    - name: nfs server setup
+      import_tasks: nfs_server.yml
+      when: "inventory_hostname == nfs_server"
+      
+    - name: nfs client setup
+      import_tasks: nfs_client.yml
+      when: "inventory_hostname == nfs_client"
+    
+    # - name: apt sources setup
+    #   import_tasks: apt-sources.yml
+  tags: mountNfs

@@ -1,0 +1,21 @@
+---
+
+
+- name: setup evironment
+  copy:
+    src: ../files/bashrc
+    dest: /home/rahul/.bashrc
+    owner: rahul
+    group: rahul
+    mode: 0644
+  tags: user-setup
+
+- name: copy sudo 
+  copy:
+    src: sudoers
+    dest: '/etc/sudoers.d/custom_sudoers'
+    owner: root
+    group: root
+    mode: 0440
+    validate: 'bash -c "cat /etc/sudoers %s | visudo -cf-"'
+  tags: user-setup

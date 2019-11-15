@@ -1,0 +1,10 @@
+---
+
+### Docker stack deploy.
+
+- name: Deploy rdxcloud stack from a compose file
+  docker_stack:
+    state: present
+    name: rdxcloud
+    compose:
+      - "{{ nextcloud_app_path }}/docker-compose.yml"

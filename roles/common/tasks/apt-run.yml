@@ -1,0 +1,21 @@
+---
+
+- name: apt run
+  apt: 
+    name: "{{ package }}"
+    upgrade: "{{ upgrade }}"
+    update_cache: yes
+    cache_valid_time: 86400
+    autoclean: yes
+    autoremove: yes
+    state: "{{ state }}"
+  loop: "{{ package_list }}"
+  loop_control: 
+    loop_var: package
+  register: output
+  tags: update
+
+- name: apt run debug
+  debug:
+    var: output
+  tags: update

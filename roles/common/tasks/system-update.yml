@@ -1,0 +1,17 @@
+---
+
+- name: system update
+  apt: 
+    upgrade: dist
+    update_cache: yes
+    cache_valid_time: 86400
+    autoclean: yes
+    autoremove: yes
+    state: latest
+  register: output
+  tags: update
+
+- name: update output
+  debug:
+    var: output
+  tags: update

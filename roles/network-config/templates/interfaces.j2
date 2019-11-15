@@ -1,0 +1,22 @@
+##############################################
+### Default Loop back settings
+##############################################
+auto lo
+iface lo inet loopback
+
+{% for settings in interface_settings %}
+##############################################
+### Settings for iface = {{ settings.iface }}
+##############################################
+{% if settings.extra_auto is defined %}
+{{ settings.extra_auto }} {{ settings.iface }}
+{% else %}
+{{ settings.selection }} {{ settings.iface }}
+{% endif %}
+iface {{ settings.iface }} {{ settings.family }} {{ settings.method }}
+{% if settings.address is defined %}
+    address {{ settings.address }}/{{ settings.prefix }}
+    gateway {{ settings.gateway }}
+{% endif %}
+
+{% endfor %}

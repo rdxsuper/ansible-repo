@@ -1,0 +1,12 @@
+---
+
+- name: Build/Recreate Pihole and Cloudflared Container Images
+  docker_compose:
+    project_src: "{{ path }}"
+    pull: yes
+    state: present
+    build: yes
+    recreate: "{{ recreate | default('always') }}"
+  register: output
+  ignore_errors: yes
+  

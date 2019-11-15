@@ -1,0 +1,3 @@
+FROM elasticsearch:{{ elasticsearch_version }}
+
+RUN bin/elasticsearch-plugin install --batch ingest-attachment

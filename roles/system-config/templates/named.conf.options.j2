@@ -1,0 +1,27 @@
+acl "trusted_networks" { {% for ip in trusted_networks_ips %} 
+            {{ ip }}; {% endfor %} 
+    };
+	
+options {
+	directory "/var/cache/bind";
+
+      	recursion yes;
+        allow-query { trusted_networks; };
+	listen-on port 5353 {   
+        {% for ip in listen_on_ips %}
+                {{ ip }};
+        {% endfor %}
+    };
+        forwarders {
+        {% for ip in forwarder_ips %}
+                {{ ip }};
+        {% endfor %}
+    };
+	forward only;
+
+	dnssec-enable yes;
+	dnssec-validation yes;
+
+	auth-nxdomain no;    # conform to RFC1035
+	listen-on-v6 { any; };
+};

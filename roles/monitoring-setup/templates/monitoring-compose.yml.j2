@@ -1,0 +1,76 @@
+---
+version: '3.3'
+
+services:
+
+  prometheus:
+    image: prom/prometheus
+    hostname: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - {{ path }}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prom-volume:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    dns:
+      - 127.0.0.11
+    networks:
+      - monitoring 
+    deploy:
+      replicas: 1
+    restart: unless-stopped
+         
+  grafana:
+    image: grafana/grafana
+    hostname: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - metrics-volume:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=temp123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    dns:
+      - 127.0.0.11
+    networks:
+      - monitoring
+    depends_on: 
+      - prometheus
+    deploy:
+      replicas: 1
+    restart: unless-stopped
+
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:7.4.0
+  #   hostname: kibana
+  #   ports:
+  #     - 80:80
+  #   environment:
+  #     - SERVER_NAME=kibana
+  #     - ELASTISEARCH_HOST=http://elasticsearch:9200
+  #     - XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED=true
+  #     - ELASTICSEARCH_SSL_VERIFICATIONMODE=none
+  #     - SERVER_HOST="0"
+  #   dns:
+  #     - 127.0.0.11
+
+  #   networks:
+  #     - rdxcloud_nextcloud
+  #     - monitoring
+    
+  #   deploy:
+  #     replicas: 1
+  #   restart: unless-stopped
+  
+networks:
+  monitoring:
+  rdxcloud_nextcloud:
+    external: true
+
+volumes:
+   metrics-volume:
+   prom-volume:

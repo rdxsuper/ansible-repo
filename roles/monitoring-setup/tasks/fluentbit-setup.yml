@@ -1,0 +1,13 @@
+---
+
+
+- name: Set packages variable
+  set_fact:
+    packages: 
+      - td-agent-bit 
+
+- name: Install td-agent-bit(fluentbit) package
+  import_role: 
+    name: package-manage
+    tasks_from: apt-install-packages
+

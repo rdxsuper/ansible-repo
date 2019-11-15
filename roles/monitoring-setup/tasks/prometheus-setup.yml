@@ -1,0 +1,43 @@
+---
+- name: Prometheus Setup
+  block:
+    - name: create directories
+      file:
+        path: "{{ path }}/{{ dir }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - prometheus
+        - grafana
+      loop_control:
+        loop_var: dir
+
+    - name: installing pip3
+      apt:
+        name: python3-pip
+        state: present
+        autoclean: yes
+        autoremove: yes  
+
+    - name: pip install docker-compose
+      pip:
+        name: docker-compose
+        
+    - name: copy templates
+      template:
+        src: "{{ files[item]['src_template'] }}"
+        dest: "{{ path }}/{{ files[item]['dest_dir'] }}/{{ files[item]['dest_file'] }}"
+        owner: root
+        group: root
+        mode: 0755
+      loop: "{{ files.keys() }}"
+
+    - name: docker compose up
+      docker_compose:
+        project_src: "{{ path }}"
+        pull: yes
+        state: present
+        build: yes
+        recreate: always
+      register: output
+      ignore_errors: yes

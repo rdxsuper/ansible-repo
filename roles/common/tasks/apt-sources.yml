@@ -1,0 +1,88 @@
+---
+
+- name: setting nfs server info
+  set_fact: 
+    mirror_server: "nfs_server"
+
+- name: install apt-mirror
+  block:
+    - name: Install apt-mirror package
+      apt:
+        name: "{{ install_packages }}"
+        state: present
+      vars:
+        install_packages:
+          - apt-mirror
+
+    - name: setup apt mirror list
+      copy:
+        src: ../files/lists/mirror.list
+        dest: /etc/apt/mirror.list
+        owner: root
+        group: root    
+        mode: '0664'
+
+    - name: configure hourly cron for apt mirror 
+      copy:
+        src: ../files/repo-mirror-sync
+        dest: /etc/cron.hourly/
+        owner: root
+        group: root
+        mode: '0655'
+  when: "inventory_hostname == nfs_server"
+
+- name: remove apt-mirror
+  block:
+    - name: Removing apt-mirror package
+      apt:
+        name: "{{ remove_packages }}"
+        state: absent
+      vars:
+        remove_packages:
+          - apt-mirror
+
+    - name: remove apt mirror list
+      file:
+        path: /etc/apt/mirror.list
+        state: absent
+
+    - name: remove hourly cron for apt mirror 
+      file:
+        path: /etc/cron.hourly/repo-mirror-sync
+        state: absent
+  when: "inventory_hostname != nfs_server"
+
+- name: setup apt sources list
+  copy:
+    src: ../files/lists/sources.list
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root    
+    mode: '0664'
+
+- name: setup apt source gpg
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { src: "../files/gpg-files/trusted.gpg", dest: "/etc/apt/trusted.gpg", owner: root, group: root, mode: '0644' }
+    - { src: "../files/gpg-files/ansible_ubuntu_ansible.gpg", dest: "/etc/apt/trusted.gpg.d/ansible_ubuntu_ansible.gpg", owner: root, group: root, mode: '0644' }
+    - { src: "../files/gpg-files/microsoft.gpg", dest: "/etc/apt/trusted.gpg.d/microsoft.gpg", owner: root, group: root, mode: '0644' }
+    - { src: "../files/gpg-files/nextcloud-devs_ubuntu_client.gpg", dest: "/etc/apt/trusted.gpg.d/nextcloud-devs_ubuntu_client.gpg", owner: root, group: root, mode: '0644' }
+    - { src: "../files/gpg-files/ubuntu-keyring-2012-archive.gpg", dest: "/etc/apt/trusted.gpg.d/ubuntu-keyring-2012-archive.gpg", owner: root, group: root, mode: '0644' }
+    - { src: "../files/gpg-files/ubuntu-keyring-2012-cdimage.gpg", dest: "/etc/apt/trusted.gpg.d/ubuntu-keyring-2012-cdimage.gpg", owner: root, group: root, mode: '0644' }
+    - { src: "../files/gpg-files/ubuntu-keyring-2018-archive.gpg", dest: "/etc/apt/trusted.gpg.d/ubuntu-keyring-2018-archive.gpg", owner: root, group: root, mode: '0644' }
+
+
+- name: set variable to empty the sources.list.d dir
+  set_fact:
+    directories: 
+      - '/etc/apt/sources.list.d'
+    type: 'file'
+
+- name: remove files in /etc/apt/sources.list.d
+  include_tasks: remove-files.yml
+

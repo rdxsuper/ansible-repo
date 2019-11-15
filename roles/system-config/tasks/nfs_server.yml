@@ -1,0 +1,40 @@
+---
+
+- name: nfs server setup
+  block:
+    - name: mount nfs shares
+      include_tasks: filesystem.yml
+      loop: "{{ disks }}"
+      loop_control: 
+        loop_var: disk
+      
+    - name: copy default source list file 
+      copy:
+        src: ../files/lists/default.source.list
+        dest: /etc/apt/sources.list
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Install nfs packages on server
+      apt:
+        name: "{{ nfs_package }}"
+        state: present
+      loop:
+        - nfs-kernel-server
+      loop_control: 
+        loop_var: nfs_package
+      
+    - name: copy exports file
+      template:
+        src: exports.j2
+        dest: /etc/exports
+        owner: root
+        group: root
+        mode: 0644
+      
+    - name: restart nfs server
+      systemd:
+        name: nfs-kernel-server
+        state: restarted
+  tags: mountNfs

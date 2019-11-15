@@ -1,0 +1,32 @@
+---
+# tasks file for squid-deploy
+
+- name: Create required directories
+  file:
+    path: "{{ docker_path }}/{{ templates.dest_dir }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ template_files }}"
+  loop_control:
+    loop_var: templates
+
+- name: Copy templates
+  template:
+    src: "{{ templates.src }}"
+    dest: "{{ docker_path }}/{{ templates.dest_dir }}/{{ templates.dest_file }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ template_files }}"
+  loop_control:
+    loop_var: templates
+
+- name: docker compose up
+  docker_compose:
+    project_src: "{{ docker_path }}/squid"
+    pull: yes
+    state: present
+    build: yes
+    recreate: always
+  register: output
+  ignore_errors: yes

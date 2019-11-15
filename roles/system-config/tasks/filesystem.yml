@@ -1,0 +1,40 @@
+---
+#
+# sudo ansible-playbook -i inventories/hosts -l rdxhome master.yml --tags=mountDisk -e drive="repo"
+# sudo ansible-playbook -i inventories/hosts -l rdxlaptop master.yml --tags=mountDisk -e drive="repo"
+#
+# sudo ansible-playbook -i inventories/hosts -l rdxhome master.yml --tags=mountDisk -e drive="cloud"
+# sudo ansible-playbook -i inventories/hosts -l rdxlaptop master.yml --tags=mountDisk -e drive="cloud"
+#
+# sudo ansible-playbook -i inventories/hosts -l rdxhome system-config.yml --tags=mountDisk -e drive=MyPassport
+#
+
+- name: mount filesystem
+  mount:
+    path: "{{ disk.mount_path }}"
+    src: "{{ disk.dev }}"
+    fstype: "{{ disk.fstype }}"
+    opts: "{{ disk.opts }}"
+    backup: yes
+    state: "{{ disk.state }}"
+  tags: mountDisk
+  register: output
+  ignore_errors: yes
+  loop: "{{ ansible_facts.device_links.uuids | dict2items | subelements('value') }}"
+  when: "disk.fstype != nfs and item.1 is defined and disk.UUID is in item"
+
+- name: debug output
+  debug:
+    var: output.msg
+  when: "output.msg == 'All items completed'"
+
+# - name: test
+#   set_fact: 
+#     test: "{{ lookup('dict','output') }}"
+
+# - name: debug output
+#   debug:
+#     var: test
+#  when: "{{ output.results | dict2items | subelements('value') }}"
+
+

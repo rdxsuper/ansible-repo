@@ -1,0 +1,65 @@
+---
+
+- name: setting nfs server info
+  set_fact: 
+    mirror_server: "nfs_server"
+    nfs_server: "rdxhome"
+    nfs_client: "rdxlaptop"
+
+- name: install apt-mirror
+  block:
+    - name: Install apt-mirror package
+      apt:
+        name: "{{ install }}"
+        state: present
+      loop:
+        - apt-mirror
+      loop_control:
+        loop_var: install
+
+    - name: setup apt mirror list
+      copy:
+        src: mirror.list
+        dest: /etc/apt/mirror.list
+        owner: root
+        group: root    
+        mode: '0664'
+
+    - name: Run /usr/bin/apt-mirror every hour
+      cron:
+        name: "a job updating mirror repo"
+        special_time: hourly
+        job: "/usr/bin/apt-mirror &"
+
+  when: "inventory_hostname == nfs_server"
+
+- name: remove apt-mirror
+  block:
+    - name: Removing apt-mirror package
+      apt:
+        name: "{{ remove }}"
+        state: absent
+      loop:
+        - apt-mirror
+      loop_control:
+        loop_var: remove
+
+    - name: remove apt mirror list
+      file:
+        path: /etc/apt/mirror.list
+        state: absent
+
+    - name: Run /usr/bin/apt-mirror every hour
+      cron:
+        name: "a job updating mirror repo"
+        state: absent
+  when: "inventory_hostname != nfs_server"
+
+# - name: run apt-mirror
+#   shell: "/usr/bin/apt-mirror &"
+
+- name: Repo cache update
+  apt: 
+    update_cache: yes
+  register: apt_out
+  ignore_errors: yes

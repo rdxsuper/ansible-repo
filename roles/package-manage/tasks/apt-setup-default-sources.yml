@@ -1,0 +1,26 @@
+---
+
+- name: set variable to empty the sources.list.d dir
+  set_fact:
+    list: 
+      - '/etc/apt/sources.list.d'
+      - '/etc/apt/sources.list'
+    
+- name: remove files in sources lists
+  import_role: 
+    name: common 
+    tasks_from: remove-files.yml
+
+- name: Copy default sources list
+  copy:
+    src: default.sources.list
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Repo cache update
+  apt: 
+    update_cache: yes
+  register: apt_out
+  ignore_errors: yes

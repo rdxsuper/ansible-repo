@@ -1,0 +1,12 @@
+---
+
+- name: Cache update
+  apt: 
+    state: "{{ state | default('latest') }}"
+    autoclean: yes
+    autoremove: yes
+    update_cache: yes
+    upgrade: "{{ upgrade | default('no') }}"
+    purge: "{{ purge | default('no') }}"
+  register: apt_out
+  ignore_errors: yes

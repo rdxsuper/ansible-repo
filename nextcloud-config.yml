@@ -1,0 +1,4 @@
+---
+- hosts: swarm
+  roles:
+    - nextcloud-deploy

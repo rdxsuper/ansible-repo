@@ -1,0 +1,51 @@
+---
+# defaults file for nextcloud-deploy
+
+nextcloud_app_path: ''
+
+docker_vars:
+  haproxy:
+    path: "{{ nextcloud_app_path }}/haproxy"
+    dir: 'haproxy'
+
+  nextcloud:
+    path: "{{ nextcloud_app_path }}/nextcloud"
+    dir: 'nextcloud'
+
+  postgres:
+    path: "{{ nextcloud_app_path }}/postgres"
+    dir: 'postgres'
+
+  elasticsearch:
+    path: "{{ nextcloud_app_path }}/elasticsearch"
+    dir: 'elasticsearch'
+    image: 'elasticsearch_rahul:7.4.0'
+
+swarm_state: present
+
+swarm_nodes:
+  - rdxhome
+  - rdxlaptop
+
+packages:
+  - 'docker-ce'
+  - 'docker-compose'
+
+python_packages:
+  - 'python3'
+  - 'python3-pip'
+
+pip3_modules:
+  - 'docker'
+  - 'docker-compose'
+  - 'jsondiff'
+
+elasticsearch_version: '7.4.0'
+
+passwd: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          37336439613334666164316231666530633761366661333462326464653730376664303366316137
+          3732613362623865393464626666333730313338346165330a333064623433303366356566316362
+          31366466333263363566613736653430333530393662363339643730656561393162313938663462
+          6439666364366665320a323664633731373837333135666366653938316462323965363732333134
+          3163

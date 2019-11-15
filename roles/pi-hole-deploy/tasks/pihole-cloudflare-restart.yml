@@ -1,0 +1,11 @@
+---
+
+- name: Restarting Pihole and Cloudflared
+  docker_compose:
+    project_src: "{{ path }}"
+    pull: yes
+    state: present
+    restarted: "{{ restarted | default('yes') }}"
+  register: output
+  ignore_errors: yes
+

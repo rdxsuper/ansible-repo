@@ -1,0 +1,7 @@
+---
+
+- name: remove collected files and directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ list }}"

@@ -1,0 +1,34 @@
+---
+
+- name: Telegraf Setup
+  block:
+    - name: Set packages variable
+      set_fact:
+        packages: 
+          - telegraf 
+
+    - name: Install telegraf package
+      import_role: 
+        name: package-manage
+        tasks_from: apt-install-packages
+
+    - name: Copy telegraf file 
+      copy:
+        src: telegraf.conf
+        dest: /etc/telegraf/telegraf.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Add telegraf user to docker
+      user:
+        name: telegraf
+        shell: /bin/false
+        groups: docker
+        append: yes
+        
+    - name: Start telegraf service
+      systemd:
+        name: telegraf
+        state: restarted
+        

@@ -1,0 +1,27 @@
+---
+
+- name: setting type to be deleted
+  set_fact:
+    del_list: "{{ type | default('file') }}"
+
+- name: Scan files under specified direcotories
+  find:
+    paths: "{{ directory }}"
+    hidden: True
+    recurse: True
+    file_type: "{{ del_list }}"
+  loop: "{{ directories }}"
+  loop_control:
+    loop_var: directory
+  register: collected_items 
+
+- name: Files/Directories that will be deleted
+  debug:
+    msg: "{{ item.1.path }}"
+  loop: "{{ collected_items.results|subelements('files') }}"  
+  
+- name: remove collected files and directories
+  file:
+    path: "{{ item.1.path }}"
+    state: absent
+  loop: "{{ collected_items.results|subelements('files') }}"

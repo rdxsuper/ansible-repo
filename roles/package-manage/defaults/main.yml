@@ -1,0 +1,22 @@
+---
+# defaults file for package-install
+
+packages:
+  - 'bind9'
+  - 'docker'
+  - 'ansible'
+  - 'docker-compose'
+  - 'vim'
+  - 'apt-mirror'
+  - 'virtualbox'
+  - 'rwho'
+  - 'rwhod'
+  - 'vagrant'
+  - 'code'
+  - 'docker-ce'
+  - 'apt'
+  - 'network-manager'
+  - 'python3-dbus'
+  - 'libnm-glib-dev'
+  - 'aptitude'
+  - 'telegraf'

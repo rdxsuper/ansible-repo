@@ -1,0 +1,65 @@
+---
+# tasks file for pi-hole-deploy
+# How to run
+# sudo ansible-playbook -i ../hosts -l rdxhome main.yml
+
+### Configures System DNS to Public DNS So that Name resolution works 
+- name: copy default resolv.conf so we dont block dns-over-tls while working this
+  copy:
+    src: resolv_public_dns.conf
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - pihole_cloudflare_setup
+    - pihole_cloudflare_recreate_update_images
+    - pihole_update_adlists
+    - pihole_cloudflare_restart
+
+### Copy Pihole and Cloudflared files 
+- import_tasks: pihole-cloudflare-create-copy-files.yml
+  tags: 
+    - pihole_cloudflare_setup
+
+### Docker build and Docker compose up
+- import_tasks: pihole-cloudflare-build-run-recreate-containers.yml
+  tags:
+    - pihole_cloudflare_setup
+    - pihole_cloudflare_recreate_update_images
+
+### Addig Ad block lists
+- import_tasks: pihole-update-adlists.yml
+  tags: 
+    - pihole_update_adlists
+
+### Restart Docker containers after adding Block Lists
+- import_tasks: pihole-cloudflare-restart.yml
+  tags: 
+    - pihole_cloudflare_restart
+    - pihole_update_adlists
+
+### Setup the Custom DNS that points to Pihole and Cloudflared
+- name: copy custom dns if previous step succeed
+  copy:
+    src: resolv_custom_dns.conf
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+  when: "output.failed != true"
+  tags:
+    - pihole_cloudflare_recreate_update_images
+    - pihole_cloudflare_setup
+    - pihole_update_adlists
+    - pihole_cloudflare_restart
+
+- name: output
+  debug:
+    var: output
+  tags:
+    - pihole_cloudflare_recreate_update_images
+    - pihole_cloudflare_setup
+    - pihole_update_adlists
+    - pihole_cloudflare_restart
+    

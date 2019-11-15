@@ -1,0 +1,124 @@
+---
+version: '3.3'
+
+services:
+
+  db:
+    image: postgres:11-alpine
+    hostname: db
+    volumes:
+      - {{ docker_vars.postgres.path }}:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD={{ passwd }}
+    networks:
+      - nextcloud
+    dns:
+      - 127.0.0.11
+    deploy:
+      replicas: 1
+         
+  redis:
+    image: redis
+    hostname: redis
+    ports:
+      - target: 6379
+        published: 6379
+        protocol: tcp
+        mode: host
+    networks:
+      - nextcloud
+    dns:
+      - 127.0.0.11
+    deploy:
+      replicas: 1
+     
+  haproxy:
+    image: haproxy
+    hostname: haproxy
+    networks:
+      - nextcloud
+    volumes:
+      - {{ docker_vars.haproxy.path }}/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - {{ docker_vars.haproxy.path }}/rdxcloud.pem:/etc/ssl/private/rdxcloud.pem:ro
+    ports:
+      - "192.168.1.213:443:443"
+      - "192.168.1.213:8888:8888"
+    dns:
+      - 127.0.0.11
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == rdxhome
+     
+  nextcloud:
+    image: nextcloud:17.0-apache
+    hostname: nextcloud
+    ports:
+      - "80"
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD={{ passwd }}
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+      - REDIS_HOST_PORT=6379
+      - NEXTCLOUD_ADMIN_USER=admin
+      - NEXTCLOUD_ADMIN_PASSWORD={{ passwd }}
+      # - NEXTCLOUD_TRUSTED_DOMAINS=
+    volumes:
+      - {{ docker_vars.nextcloud.path }}:/var/www/html
+    networks:
+      - nextcloud
+    dns:
+      - 127.0.0.11
+    depends_on:
+      - haproxy
+      - db
+    deploy:
+      replicas: 1
+
+  elasticsearch:
+    image: {{ docker_vars.elasticsearch.image }} ### Template needs to be copied after docker image is built and set fact for image as part of ansible deploy
+    hostname: elasticsearch
+    environment:
+      - cluster.initial_master_nodes=elasticsearch
+    volumes:
+      - {{ docker_vars.elasticsearch.path }}:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - nextcloud
+    dns:
+      - 127.0.0.11
+    depends_on:
+      - haproxy
+      - db
+      - nextcloud
+    deploy:
+      replicas: 1
+
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.4.0
+    hostname: kibana
+    ports:
+      - 80:80
+    environment:
+      - SERVER_NAME=kibana
+      - ELASTISEARCH_HOST=http://elasticsearch:9200
+      - XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED=true
+      - ELASTICSEARCH_SSL_VERIFICATIONMODE=none
+      - SERVER_HOST="0"
+    dns:
+      - 127.0.0.11
+    networks:
+      - nextcloud
+    deploy:
+      replicas: 1
+    restart: unless-stopped      
+
+
+networks:
+  nextcloud:

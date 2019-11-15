@@ -1,0 +1,40 @@
+############# config ##################
+#
+set base_path    /repo
+
+#/var/spool/apt-mirror
+#
+set mirror_path  $base_path/mirror
+set skel_path    $base_path/skel
+set var_path     $base_path/var
+set cleanscript $var_path/clean.sh
+set defaultarch  amb64
+set postmirror_script $var_path/postmirror.sh
+set run_postmirror 0
+set nthreads     20
+set _tilde 0
+#
+############# end config ##############
+
+### Ubuntu Repo
+deb [arch=amd64] http://us.archive.ubuntu.com/ubuntu/ bionic main restricted
+deb [arch=amd64] http://us.archive.ubuntu.com/ubuntu/ bionic-updates main restricted
+deb [arch=amd64] http://us.archive.ubuntu.com/ubuntu/ bionic universe
+deb [arch=amd64] http://us.archive.ubuntu.com/ubuntu/ bionic-updates universe
+deb [arch=amd64] http://us.archive.ubuntu.com/ubuntu/ bionic multiverse
+deb [arch=amd64] http://us.archive.ubuntu.com/ubuntu/ bionic-updates multiverse
+deb [arch=amd64] http://us.archive.ubuntu.com/ubuntu/ bionic-backports main restricted universe multiverse
+deb [arch=amd64] http://security.ubuntu.com/ubuntu bionic-security main restricted
+deb [arch=amd64] http://security.ubuntu.com/ubuntu bionic-security universe
+deb [arch=amd64] http://security.ubuntu.com/ubuntu bionic-security multiverse
+
+### Virtualbox Repo
+#deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian bionic contrib
+
+### Docker Repo
+#deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+
+### VSCode Repo
+#deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+
+clean http://archive.ubuntu.com/ubuntu

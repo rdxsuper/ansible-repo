@@ -1,0 +1,38 @@
+# tasks file for nextcloud-deploy
+
+# - set_fact:
+#     path: '/cloud/rdxcloud_docker/nextcloud-app'
+
+## Create Directories for Config files of Nextcloud, Postgres, HAproxy, Elastisearch
+- name: create directories
+  file:
+    path: "{{ dirs.path }}"
+    state: directory
+    owner: "{{ dirs.owner }}" 
+    group: "{{ dirs.group }}"
+    mode: "{{ dirs.mode }}"
+  loop:
+    - { path: "{{ nextcloud_app_path}}",              owner: 'root',      group: 'root', mode: '0755' }
+    - { path: "{{ docker_vars.haproxy.path }}",       owner: 'root',      group: 'root', mode: '0755' }
+    - { path: "{{ docker_vars.nextcloud.path }}",     owner: 'www-data',  group: 'root', mode: '0755' }
+    - { path: "{{ docker_vars.postgres.path }}",      owner: '70',        group: 'root', mode: '0755' }
+    - { path: "{{ docker_vars.elasticsearch.path }}", owner: 'root',      group: 'root', mode: '0755' }  
+  loop_control:
+    loop_var: dirs
+
+# ### Copy Config templates and filesystem
+# ### Below hash vars are also used inside templates for consistency
+- name: copy templates
+  template:
+    src: "{{ configs.file }}"
+    dest: "{{ configs.path }}/{{ configs.dest_file }}"
+    owner: "{{ configs.owner }}"
+    group: "{{ configs.group }}"
+    mode: "{{ configs.mode }}"
+  loop:
+    - { path: "{{ nextcloud_app_path }}",             file: 'docker-compose.yml.j2',        dest_file: 'docker-compose.yml',  owner: 'root', group: 'root', mode: '0755' }    
+    - { path: "{{ docker_vars.haproxy.path }}",       file: 'haproxy.cfg.j2',               dest_file: 'haproxy.cfg',         owner: 'root', group: 'root', mode: '0755' }
+    - { path: "{{ docker_vars.haproxy.path }}",       file: 'rdxcloud.pem',                 dest_file: 'rdxcloud.pem',        owner: 'root', group: 'root', mode: '0755' }
+    - { path: "{{ docker_vars.elasticsearch.path }}", file: 'elasticsearch-dockerfile.j2',  dest_file: 'Dockerfile',          owner: 'root', group: 'root', mode: '0755' }  
+  loop_control:
+    loop_var: configs

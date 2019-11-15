@@ -1,0 +1,27 @@
+---
+# defaults file for pi-hole-deploy
+
+
+# vars file for pi-hole-deploy
+
+path: '/cloud/rdxcloud_docker/dns-over-tls'
+
+# Nextcloud ip and url are added to hosts file in pihole so that it doesnt block it 
+# nextcloud_ip: ''
+# nextcloud_url: ''
+
+files:
+  - name: cloudflared
+    src: 'cloudflared_dockerfile.j2'
+    dest_dir: 'cloudflared'
+    dest_file: 'Dockerfile'
+
+  - name: pihole
+    src: 'pi_hole_dockerfile.j2'
+    dest_dir: 'pihole'
+    dest_file: 'Dockerfile'
+
+  - name: docker-compose
+    src: 'docker-compose.yml.j2'
+    dest_dir: ''
+    dest_file: 'docker-compose.yml'
